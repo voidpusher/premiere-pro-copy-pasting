@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
+    img-src 'self' data: blob: https: file:;
+    connect-src 'self' https:;
+  " />
+  <title>Instant Paste</title>
+  <!-- Adobe CEP bridge — must load before the React bundle -->
+  <script src="lib/CSInterface.js"></script>
+  <style>
+    body { margin: 0; padding: 0; background: #1c1c1e; }
+    #root { height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>
