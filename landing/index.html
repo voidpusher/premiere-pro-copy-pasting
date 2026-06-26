@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instant Paste · Your screenshots are already clips</title>
+  <meta name="description" content="Copy any image and it drops straight onto your Premiere Pro timeline, on its own track, at the playhead. One keystroke. No exporting, no importing." />
+  <meta property="og:title" content="Instant Paste · Your screenshots are already clips" />
+  <meta property="og:description" content="Copy any image, paste it straight onto your Premiere timeline. One keystroke. ₹199 lifetime." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+
+  <style>
+    :root {
+      --bg:      #0d1012;
+      --bg-2:    #12161a;
+      --panel:   #171c21;
+      --panel-2: #1d242a;
+      --line:    rgba(255,255,255,0.07);
+      --line-2:  rgba(255,255,255,0.12);
+      --text:    #eef1f3;
+      --muted:   #8b969e;
+      --dim:     #5d666d;
+      --orange:  #ff6a3d;
+      --orange-d:#e0552c;
+      --teal:    #2dd4bf;
+      --teal-d:  #1b8a7e;
+
+      --disp: 'Space Grotesk', sans-serif;
+      --body: 'Inter', sans-serif;
+      --mono: 'Space Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: var(--body); line-height: 1.6;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+    .mono { font-family: var(--mono); }
+    .eyebrow {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--orange);
+    }
+
+    /* ── ruler divider ── */
+    .ruler {
+      height: 26px; border-top: 1px solid var(--line);
+      background-image: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 40px);
+      background-position: bottom; background-size: auto 8px; background-repeat: repeat-x;
+      opacity: .6;
+    }
+
+    /* ── nav ── */
+    nav { position: sticky; top: 0; z-index: 60; background: rgba(13,16,18,0.82); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+    .nav-in { display: flex; align-items: center; justify-content: space-between; height: 66px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-family: var(--disp); font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+    .brand .clip { width: 30px; height: 20px; border-radius: 4px; background: var(--orange); position: relative; box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.25); }
+    .brand .clip::before { content: ''; position: absolute; left: 4px; right: 4px; top: 6px; bottom: 6px; border-radius: 2px; background: rgba(0,0,0,0.22); }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--disp); font-weight: 600; font-size: 15px; padding: 11px 20px; border-radius: 9px; cursor: pointer; border: none; transition: transform .12s ease, background .15s ease; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+    .btn-primary { background: var(--orange); color: #1a0d07; }
+    .btn-primary:hover { background: #ff7d54; }
+    .btn-ghost { background: transparent; border: 1px solid var(--line-2); color: var(--text); }
+    .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── hero ── */
+    .hero { padding: 84px 0 30px; position: relative; }
+    .hero::before { content:''; position:absolute; inset:0; z-index:-1; background: radial-gradient(680px 280px at 20% 0%, rgba(255,106,61,0.12), transparent 65%), radial-gradient(540px 300px at 92% 18%, rgba(45,212,191,0.10), transparent 65%); }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 50px; align-items: center; perspective: 1100px; }
+    .hero h1 { font-family: var(--disp); font-weight: 700; font-size: clamp(40px, 5.6vw, 66px); line-height: 0.98; letter-spacing: -0.03em; margin: 18px 0 22px; }
+    .hero h1 .clipword { position: relative; color: var(--orange); white-space: nowrap; }
+    .hero h1 .clipword::after { content:''; position:absolute; left:-4px; right:-4px; bottom: 4px; height: 10px; background: rgba(255,106,61,0.18); border-left: 2px solid var(--orange); border-right: 2px solid var(--orange); z-index:-1; }
+    .hero p.lead { font-size: 18px; color: var(--muted); max-width: 480px; margin-bottom: 30px; }
+    .hero-cta { display: flex; gap: 13px; align-items: center; flex-wrap: wrap; }
+    kbd { font-family: var(--mono); font-size: 12px; background: var(--panel-2); border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 5px; padding: 3px 7px; color: var(--text); }
+    .hero-foot { margin-top: 22px; font-family: var(--mono); font-size: 12.5px; color: var(--dim); letter-spacing: 0.03em; }
+
+    /* ── the timeline (signature) ── */
+    .tl { background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; box-shadow: 0 40px 90px rgba(0,0,0,0.55); transform-style: preserve-3d; will-change: transform; }
+    .tl-body { will-change: transform; }
+    .tl-top { display: flex; align-items: center; justify-content: space-between; padding: 9px 13px; background: var(--bg-2); border-bottom: 1px solid var(--line); }
+    .tl-top .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .tl-top .tc { font-family: var(--mono); font-size: 12px; color: var(--teal); letter-spacing: 0.04em; }
+    .tl-body { position: relative; padding: 0 0 12px; }
+    /* timecode ruler */
+    .tc-ruler { display: flex; padding-left: 54px; height: 22px; align-items: flex-end; border-bottom: 1px solid var(--line); background-image: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 30px); }
+    .tc-ruler span { font-family: var(--mono); font-size: 9.5px; color: var(--dim); flex: 1; }
+    /* track rows */
+    .track { display: flex; align-items: center; height: 52px; border-bottom: 1px solid var(--line); }
+    .track:last-child { border-bottom: none; }
+    .track .label { width: 54px; flex: none; font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: center; border-right: 1px solid var(--line); align-self: stretch; display: flex; align-items: center; justify-content: center; background: var(--bg-2); }
+    .lane { position: relative; flex: 1; height: 100%; }
+    .clip-block { position: absolute; top: 9px; bottom: 9px; border-radius: 5px; display: flex; align-items: center; padding: 0 9px; font-family: var(--mono); font-size: 10px; overflow: hidden; }
+    .clip-video { left: 8%; width: 46%; background: linear-gradient(180deg, var(--teal), var(--teal-d)); color: #04201d; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
+    .clip-audio { left: 4%; width: 64%; background: var(--panel-2); border: 1px solid var(--line-2); color: var(--muted); }
+    .clip-audio .wave { position:absolute; inset: 0 8px; background-image: repeating-linear-gradient(90deg, var(--teal-d) 0 1.5px, transparent 1.5px 5px); opacity:.45; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+    /* the pasted image clip */
+    .clip-image { left: 30%; width: 30%; top: 8px; bottom: 8px; background: #0e1316; border: 1.5px solid var(--orange); color: var(--orange); padding: 0; }
+    .clip-image .thumb { position:absolute; inset: 3px; border-radius: 3px; background: linear-gradient(135deg, var(--teal) 0%, var(--orange) 100%); overflow:hidden; }
+    .clip-image .thumb svg { position:absolute; right: 5px; bottom: 4px; opacity: .85; }
+    .clip-image .tag { position: absolute; left: 5px; top: 3px; font-family: var(--mono); font-size: 9px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); z-index: 2; }
+    /* playhead */
+    .playhead { position: absolute; top: 0; bottom: 0; left: calc(54px + 38%); width: 2px; background: var(--orange); z-index: 5; }
+    .playhead::before { content:''; position: absolute; top: -1px; left: -5px; border: 6px solid transparent; border-top-color: var(--orange); }
+
+    .tl, .tl * { user-select: none; -webkit-user-select: none; }
+    .clip-block { cursor: grab; }
+    .clip-block:active { cursor: grabbing; }
+    .clip-block.dragging { box-shadow: 0 14px 30px rgba(0,0,0,0.55); filter: brightness(1.1); z-index: 20; }
+
+    @keyframes dropIn { 0% { transform: translateY(-34px); opacity: 0; } 70% { transform: translateY(4px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+    .clip-image { animation: dropIn .7s cubic-bezier(.3,.9,.3,1.2) both; animation-delay: .5s; }
+    @media (prefers-reduced-motion: reduce) { .clip-image { animation: none; } }
+
+    /* ── section scaffolding ── */
+    section { padding: 80px 0; }
+    .sec-head { max-width: 620px; margin-bottom: 46px; }
+    .sec-head h2 { font-family: var(--disp); font-weight: 700; font-size: clamp(28px, 4vw, 42px); letter-spacing: -0.02em; line-height: 1.05; margin: 12px 0 12px; }
+    .sec-head p { color: var(--muted); font-size: 16.5px; }
+
+    /* old vs new */
+    .versus { display: grid; gap: 14px; }
+    .vrow { display: grid; grid-template-columns: 86px 1fr; align-items: center; gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+    .vrow .vlabel { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+    .steps { display: flex; gap: 6px; flex-wrap: wrap; }
+    .step-chip { font-family: var(--mono); font-size: 11px; padding: 6px 9px; border-radius: 5px; background: var(--panel-2); color: var(--dim); border: 1px solid var(--line); }
+    .vrow.new { border-color: rgba(255,106,61,0.4); }
+    .vrow.new .step-chip { background: rgba(255,106,61,0.12); border-color: var(--orange); color: var(--orange); }
+
+    /* spec list */
+    .specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .spec { background: var(--panel); padding: 26px 24px; }
+    .spec .k { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; color: var(--orange); text-transform: uppercase; }
+    .spec h3 { font-family: var(--disp); font-weight: 600; font-size: 18px; margin: 9px 0 7px; }
+    .spec p { color: var(--muted); font-size: 14.5px; }
+
+    /* pricing */
+    .price-sec { background: var(--bg-2); }
+    .price-wrap { display: flex; justify-content: center; }
+    .price { width: 100%; max-width: 400px; background: var(--panel); border: 1px solid var(--line-2); border-top: 3px solid var(--orange); border-radius: 12px; padding: 34px 32px; }
+    .price .ptop { display: flex; align-items: baseline; justify-content: space-between; }
+    .price .plabel { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+    .price .device { font-family: var(--mono); font-size: 11px; color: var(--dim); }
+    .price .amt { font-family: var(--disp); font-weight: 700; font-size: 60px; letter-spacing: -0.03em; margin: 10px 0 2px; }
+    .price .amt small { font-size: 22px; color: var(--muted); font-weight: 500; }
+    .price .once { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
+    .price ul { list-style: none; display: grid; gap: 11px; margin: 22px 0 26px; }
+    .price li { display: flex; gap: 10px; font-size: 14.5px; }
+    .price li .tk { color: var(--orange); font-family: var(--mono); }
+    .price .btn-primary { width: 100%; justify-content: center; padding: 14px; font-size: 16px; }
+
+    /* faq */
+    .faq { max-width: 760px; display: grid; gap: 11px; }
+    details { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 17px 20px; }
+    summary { cursor: pointer; font-weight: 600; font-family: var(--disp); list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; color: var(--orange); font-family: var(--mono); font-size: 18px; }
+    details[open] summary::after { content: '−'; }
+    details p { color: var(--muted); margin-top: 12px; font-size: 14.5px; }
+
+    footer { border-top: 1px solid var(--line); padding: 38px 0; }
+    .foot-in { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; color: var(--dim); font-family: var(--mono); font-size: 12.5px; }
+
+    @media (max-width: 860px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+      .specs { grid-template-columns: 1fr; }
+      .vrow { grid-template-columns: 70px 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="wrap nav-in">
+      <div class="brand"><span class="clip"></span> Instant&nbsp;Paste</div>
+      <a href="#pricing" class="btn btn-primary">Get it for ₹199</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Adobe Premiere Pro · Windows</span>
+        <h1>Your screenshots are&nbsp;already <span class="clipword">clips.</span></h1>
+        <p class="lead">Copy any image and it drops straight onto your timeline, on its own track, at the playhead. No Save&nbsp;As, no Import, no dragging.</p>
+        <div class="hero-cta">
+          <a href="#pricing" class="btn btn-primary">Get Instant Paste for ₹199</a>
+          <a href="#how" class="btn btn-ghost">How it works</a>
+        </div>
+        <div class="hero-foot">// copy → <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> → on the timeline</div>
+      </div>
+
+      <!-- signature: a Premiere timeline with an image clip dropping in -->
+      <div class="tl" aria-hidden="true">
+        <div class="tl-top">
+          <span><span class="dot" style="background:#ff6a3d"></span></span>
+          <span class="tc">00:00:14:08</span>
+          <span class="mono" style="font-size:11px;color:var(--dim)">Sequence 01</span>
+        </div>
+        <div class="tl-body">
+          <div class="tc-ruler"><span>00:00</span><span>00:05</span><span>00:10</span><span>00:15</span><span>00:20</span></div>
+          <div class="playhead"></div>
+
+          <div class="track">
+            <div class="label">V2</div>
+            <div class="lane">
+              <div class="clip-block clip-image">
+                <span class="tag">screenshot.png</span>
+                <span class="thumb">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="8" r="2.4" fill="#fff"/><path d="M3 19l5.5-6 3.5 4 3-3.5L21 19z" fill="#fff"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="track">
+            <div class="label">V1</div>
+            <div class="lane"><div class="clip-block clip-video">interview_A.mp4</div></div>
+          </div>
+
+          <div class="track">
+            <div class="label">A1</div>
+            <div class="lane"><div class="clip-block clip-audio"><span class="wave"></span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap"><div class="ruler"></div></div>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The difference</span>
+        <h2>Seven steps, or one keystroke.</h2>
+        <p>Getting a screenshot into your edit used to be a chore. Now it's a reflex.</p>
+      </div>
+      <div class="versus">
+        <div class="vrow">
+          <span class="vlabel">The old way</span>
+          <div class="steps">
+            <span class="step-chip">screenshot</span>
+            <span class="step-chip">Save As…</span>
+            <span class="step-chip">find file</span>
+            <span class="step-chip">File &gt; Import</span>
+            <span class="step-chip">locate it again</span>
+            <span class="step-chip">drag to timeline</span>
+            <span class="step-chip">reposition</span>
+          </div>
+        </div>
+        <div class="vrow new">
+          <span class="vlabel">Instant Paste</span>
+          <div class="steps">
+            <span class="step-chip">copy</span>
+            <span class="step-chip">Ctrl+Shift+V</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:20px;">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">What you get</span>
+        <h2>Built for the way editors actually work.</h2>
+      </div>
+      <div class="specs">
+        <div class="spec"><div class="k">Sources</div><h3>Anything on your clipboard</h3><p>Screenshots, images copied from a browser, or image files from your folders. If it's an image, it pastes.</p></div>
+        <div class="spec"><div class="k">Placement</div><h3>Onto an empty track</h3><p>Lands on its own video track at the playhead, so it never overwrites or shifts the footage you already have.</p></div>
+        <div class="spec"><div class="k">Setup</div><h3>Nothing to install or run</h3><p>No helper apps, no background services. Open the panel in Premiere and it just works.</p></div>
+        <div class="spec"><div class="k">Privacy</div><h3>Stays on your machine</h3><p>Every image is handled locally. Nothing is ever uploaded. Works fully offline.</p></div>
+        <div class="spec"><div class="k">License</div><h3>Yours for good</h3><p>One payment, lifetime access, tied to your computer. No subscription, no renewals.</p></div>
+        <div class="spec"><div class="k">Speed</div><h3>Clipboard to timeline, instantly</h3><p>A single keystroke from copy to a placed clip. That's the entire point.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="ruler"></div></div>
+
+  <section id="pricing" class="price-sec">
+    <div class="wrap">
+      <div class="sec-head" style="margin-left:auto;margin-right:auto;text-align:center;">
+        <span class="eyebrow">Pricing</span>
+        <h2>One price. Keep it forever.</h2>
+        <p style="margin:0 auto;">No subscription. No upsells. Pay once and it's yours.</p>
+      </div>
+      <div class="price-wrap">
+        <div class="price">
+          <div class="ptop"><span class="plabel">Lifetime license</span><span class="device">1 device</span></div>
+          <div class="amt"><small>₹</small>199</div>
+          <div class="once">pay once · free updates</div>
+          <ul>
+            <li><span class="tk">✓</span> Unlimited pastes, forever</li>
+            <li><span class="tk">✓</span> Every image source supported</li>
+            <li><span class="tk">✓</span> Auto-placed on the timeline</li>
+            <li><span class="tk">✓</span> Fully offline &amp; private</li>
+          </ul>
+          <a href="#" id="buyBtn" class="btn btn-primary">Buy Instant Paste</a>
+          <div style="text-align:center;margin-top:13px;font-family:var(--mono);font-size:11.5px;color:var(--dim);">secure checkout · instant delivery</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head"><span class="eyebrow">FAQ</span><h2>Good to know.</h2></div>
+      <div class="faq">
+        <details><summary>Which version of Premiere works?</summary><p>Adobe Premiere Pro 2022 and newer, on Windows.</p></details>
+        <details><summary>Do I need to install anything else?</summary><p>No. Instant Paste is completely self contained. There are no helper apps or background processes to start.</p></details>
+        <details><summary>Is this a subscription?</summary><p>No. It's a single ₹199 payment for a lifetime license tied to one machine.</p></details>
+        <details><summary>What if I get a new computer?</summary><p>Email us and we'll move your license to the new machine.</p></details>
+        <details><summary>Do my images get uploaded anywhere?</summary><p>Never. All image handling happens locally on your computer.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap foot-in">
+      <span>© 2026 Instant Paste</span>
+      <a href="mailto:sanchitp498@gmail.com" style="color:var(--teal)">sanchitp498@gmail.com</a>
+    </div>
+  </footer>
+
+  <script>
+    // Licensing backend lives on Cloudflare (CORS enabled), wired for the future purchase flow.
+    window.INSTANT_PASTE_API = 'https://instant-paste-license.sanchitp.workers.dev';
+    document.getElementById('buyBtn').addEventListener('click', function (e) {
+      e.preventDefault();
+      alert('Checkout is coming soon. Payments are being set up. 🚀');
+    });
+
+    // Interactive hero: timeline tilts toward the cursor; clips can be dragged up & down for fun.
+    (function () {
+      var card = document.querySelector('.tl');
+      var hero = document.querySelector('.hero');
+      var body = document.querySelector('.tl-body');
+      if (!card || !hero) return;
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var small  = window.matchMedia('(max-width: 860px)').matches;
+
+      // ── cursor tilt ──
+      var tx = 0, ty = 0, cx = 0, cy = 0, raf = null, paused = false;
+      function tiltMove(e) {
+        if (paused) return;
+        var r = card.getBoundingClientRect();
+        tx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width / 2)));
+        ty = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height / 2)));
+        if (!raf) raf = requestAnimationFrame(tiltLoop);
+      }
+      function tiltLeave() { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(tiltLoop); }
+      function tiltLoop() {
+        cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
+        card.style.transform = 'rotateX(' + (-cy * 7).toFixed(2) + 'deg) rotateY(' + (cx * 9).toFixed(2) + 'deg)';
+        if (body) body.style.transform = 'translate(' + (cx * -9).toFixed(1) + 'px,' + (cy * -6).toFixed(1) + 'px)';
+        if (Math.abs(tx - cx) > 0.0015 || Math.abs(ty - cy) > 0.0015) raf = requestAnimationFrame(tiltLoop);
+        else raf = null;
+      }
+      if (!reduce && !small) {
+        hero.addEventListener('mousemove', tiltMove);
+        hero.addEventListener('mouseleave', tiltLeave);
+      }
+
+      // ── draggable clips ──
+      if (!small) {
+        var pos = new WeakMap();           // clip -> {x, y}
+        var active = null, startX = 0, startY = 0, baseL = 0, baseT = 0, cw = 0, ch = 0, p0, np;
+
+        card.querySelectorAll('.clip-block').forEach(function (clip) {
+          pos.set(clip, { x: 0, y: 0 });
+          clip.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            // flatten the tilt so the drag geometry is clean
+            paused = true; card.style.transform = ''; if (body) body.style.transform = '';
+            clip.style.animation = 'none';          // stop the drop-in so inline transform applies
+            void clip.offsetWidth;                  // force reflow so geometry is settled, not mid-animation
+            active = clip; p0 = pos.get(clip);
+            startX = e.clientX; startY = e.clientY;
+            var r = clip.getBoundingClientRect();
+            cw = r.width; ch = r.height;
+            baseL = r.left - p0.x; baseT = r.top - p0.y;   // rect at translate(0,0)
+            np = { x: p0.x, y: p0.y };
+            clip.classList.add('dragging');
+          });
+        });
+
+        document.addEventListener('mousemove', function (e) {
+          if (!active) return;
+          var b = (body || card).getBoundingClientRect();
+          var nx = p0.x + (e.clientX - startX);
+          var ny = p0.y + (e.clientY - startY);
+          nx = Math.max(b.left - baseL, Math.min(b.right - baseL - cw, nx));
+          ny = Math.max(b.top - baseT, Math.min(b.bottom - baseT - ch, ny));
+          np = { x: nx, y: ny };
+          active.style.transform = 'translate(' + nx.toFixed(1) + 'px,' + ny.toFixed(1) + 'px)';
+        });
+
+        document.addEventListener('mouseup', function () {
+          if (!active) return;
+          pos.set(active, np);
+          active.classList.remove('dragging');
+          active = null; paused = false;
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>
