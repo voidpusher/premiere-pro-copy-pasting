@@ -1,0 +1,175 @@
+/* ═══════════════════════════════════════════════
+   Instant Paste — License Activation Gate
+   ═══════════════════════════════════════════════ */
+
+.license-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  background: var(--bg-primary);
+}
+
+.license-card {
+  width: 100%;
+  max-width: 320px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px 22px 20px;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.license-logo svg {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+}
+
+.license-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.license-sub {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.license-label {
+  display: block;
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.license-input {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.license-input:focus {
+  border-color: var(--accent);
+}
+
+.license-input--error {
+  border-color: var(--error);
+}
+
+.license-input--code {
+  text-align: center;
+  font-size: 20px;
+  letter-spacing: 8px;
+  font-weight: 600;
+}
+
+.license-hint-line {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.license-error {
+  text-align: left;
+  font-size: 11.5px;
+  color: var(--error);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.license-btn {
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.license-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.license-btn--primary {
+  background: var(--accent);
+  color: #fff;
+  margin-top: 16px;
+}
+
+.license-btn--primary:not(:disabled):hover {
+  background: var(--accent-hover);
+}
+
+.license-btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  margin-top: 10px;
+}
+
+.license-btn--ghost:not(:disabled):hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.license-help {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+.license-link {
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.license-link:hover {
+  text-decoration: underline;
+}
+
+/* Splash shown while validating on startup */
+.license-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 14px;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+}
+
+.license-spinner {
+  width: 26px;
+  height: 26px;
+  border: 2.5px solid var(--border-light);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: license-spin 0.8s linear infinite;
+}
+
+@keyframes license-spin {
+  to { transform: rotate(360deg); }
+}

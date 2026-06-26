@@ -3,3 +3,4 @@ dist/
 preview-dist/
 *.log
 .claude/
+.wrangler/

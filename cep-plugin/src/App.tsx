@@ -6,6 +6,8 @@ import { RecentImports } from './components/RecentImports';
 import { SettingsPanel } from './components/SettingsPanel';
 import { useClipboard } from './hooks/useClipboard';
 import { useImport } from './hooks/useImport';
+import { useLicense } from './hooks/useLicense';
+import { LicenseGate } from './components/LicenseGate';
 import { storageService } from './services/StorageService';
 import { importService } from './services/ImportService';
 import { ConnectionStatus, RecentImport } from './types';
@@ -37,6 +39,8 @@ export const App: React.FC = () => {
     cancelImport,
     dismissNotification,
   } = useImport();
+
+  const license = useLicense();
 
   const [showSettings, setShowSettings] = useState(false);
   const [recentImports, setRecentImports] = useState<RecentImport[]>(() =>
@@ -99,6 +103,28 @@ export const App: React.FC = () => {
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
   }, [handlePaste]);
+
+  // ─── License gate ────────────────────────────────────────────────────────────
+  // Placed after all hooks so the hook order stays stable across renders.
+  if (license.status === 'checking') {
+    return (
+      <div className="license-splash">
+        <div className="license-spinner" />
+        <span>Checking license…</span>
+      </div>
+    );
+  }
+  if (license.status !== 'licensed') {
+    return (
+      <LicenseGate
+        busy={license.busy}
+        startLogin={license.startLogin}
+        verifyCode={license.verifyCode}
+        startPolling={license.startPolling}
+        stopPolling={license.stopPolling}
+      />
+    );
+  }
 
   return (
     <div className="app">

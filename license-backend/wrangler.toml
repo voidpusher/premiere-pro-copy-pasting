@@ -1,0 +1,25 @@
+name = "instant-paste-license"
+main = "src/index.js"
+compatibility_date = "2024-09-01"
+
+# KV namespace that stores users, sessions, and pending logins.
+# Create it once with:  wrangler kv:namespace create LICENSES
+# then paste the printed id below.
+[[kv_namespaces]]
+binding = "LICENSES"
+id = "586b489eba4a4e6db217e306c1c28e62"
+
+[vars]
+# Shown in the login email subject/body.
+APP_NAME = "Instant Paste"
+# The "from" address for login emails. Must be a Resend-verified domain in
+# production (e.g. "Instant Paste <login@yourdomain.com>"). For first tests you
+# can use "onboarding@resend.dev" (only delivers to your own Resend account email).
+RESEND_FROM = "onboarding@resend.dev"
+# Your deployed worker's public URL — used to build the magic-link.
+# Set this AFTER the first deploy, then redeploy. e.g. https://instant-paste-license.you.workers.dev
+PUBLIC_URL = "https://instant-paste-license.sanchitp.workers.dev"
+
+# Secrets — do NOT put these here. Set them with `wrangler secret put <NAME>`:
+#   wrangler secret put RESEND_API_KEY
+#   wrangler secret put ADMIN_TOKEN

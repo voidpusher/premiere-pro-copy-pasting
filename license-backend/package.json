@@ -1,0 +1,14 @@
+{
+  "name": "instant-paste-license",
+  "version": "1.0.0",
+  "private": true,
+  "description": "License backend for Instant Paste (Cloudflare Worker, Gumroad-backed, 1-device binding)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.80.0"
+  }
+}
