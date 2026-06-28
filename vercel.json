@@ -3,6 +3,14 @@
     {
       "source": "/",
       "destination": "/landing/index.html"
+    },
+    {
+      "source": "/thank-you.html",
+      "destination": "/landing/thank-you.html"
+    },
+    {
+      "source": "/InstantPasteSetup.exe",
+      "destination": "/landing/InstantPasteSetup.exe"
     }
   ]
 }
