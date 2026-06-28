@@ -38,6 +38,10 @@ Source: "..\cep-plugin\dist\index.js";        DestDir: "{app}";       Flags: ign
 Source: "..\cep-plugin\jsx\hostScript.jsx";   DestDir: "{app}\jsx";   Flags: ignoreversion
 Source: "..\cep-plugin\lib\CSInterface.js";   DestDir: "{app}\lib";   Flags: ignoreversion
 Source: "..\cep-plugin\icons\*.png";          DestDir: "{app}\icons"; Flags: ignoreversion
+Source: "welcome.html";                       DestDir: "{app}";       DestName: "InstantPasteWelcome.html"; Flags: ignoreversion
+
+[Icons]
+Name: "{autoprograms}\Instant Paste"; Filename: "{app}\InstantPasteWelcome.html"; WorkingDir: "{app}"; IconFilename: "{app}\icons\icon_dark.png"; Comment: "Open Instant Paste setup instructions"
 
 [Registry]
 ; Allow the extension to load (covers Premiere Pro 2021-2026 / CEP 9-12).
@@ -48,4 +52,7 @@ Root: HKCU; Subkey: "Software\Adobe\CSXS.12"; ValueType: string; ValueName: "Pla
 
 [Messages]
 FinishedHeadingLabel=Instant Paste is installed
-FinishedLabel=All done!%n%n1. Fully close and reopen Adobe Premiere Pro.%n2. Open a project, then go to Window > Extensions > Instant Paste.%n3. Sign in with the email you purchased with.
+FinishedLabel=All done!%n%nInstant Paste is now installed as a Premiere Pro extension.%n%n1. Fully close and reopen Adobe Premiere Pro.%n2. Open a project, then go to Window > Extensions > Instant Paste.%n3. You can also search "Instant Paste" in the Windows Start Menu to reopen these instructions.
+
+[Run]
+Filename: "{app}\InstantPasteWelcome.html"; Description: "Open Instant Paste instructions"; Flags: shellexec postinstall nowait skipifsilent
