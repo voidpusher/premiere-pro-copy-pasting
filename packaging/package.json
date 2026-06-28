@@ -1,0 +1,14 @@
+{
+  "name": "instant-paste-packaging",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Builds and signs the Instant Paste .zxp installer",
+  "scripts": {
+    "build:zxp": "node build-zxp.js",
+    "build:installer": "\"%LOCALAPPDATA%\\Programs\\Inno Setup 6\\ISCC.exe\" installer.iss",
+    "build": "npm run build:zxp && npm run build:installer"
+  },
+  "devDependencies": {
+    "zxp-sign-cmd": "^2.0.0"
+  }
+}

@@ -1,0 +1,4 @@
+node_modules/
+staging/
+cert.p12
+.rnd

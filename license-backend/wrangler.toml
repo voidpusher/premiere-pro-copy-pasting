@@ -19,7 +19,13 @@ RESEND_FROM = "onboarding@resend.dev"
 # Your deployed worker's public URL — used to build the magic-link.
 # Set this AFTER the first deploy, then redeploy. e.g. https://instant-paste-license.you.workers.dev
 PUBLIC_URL = "https://instant-paste-license.sanchitp.workers.dev"
+# Where buyers download the installer (sent in the welcome email).
+DOWNLOAD_URL = "https://premiere-pro-copy-pasting.vercel.app/InstantPasteSetup.exe"
+# Razorpay public key id (safe to expose; the secret stays a Worker secret).
+RAZORPAY_KEY_ID = ""
 
 # Secrets — do NOT put these here. Set them with `wrangler secret put <NAME>`:
 #   wrangler secret put RESEND_API_KEY
 #   wrangler secret put ADMIN_TOKEN
+#   wrangler secret put RAZORPAY_KEY_SECRET      (from Razorpay dashboard - API Keys)
+#   wrangler secret put RAZORPAY_WEBHOOK_SECRET  (you choose this when creating the webhook)

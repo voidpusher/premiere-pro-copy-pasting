@@ -41,6 +41,8 @@ export default {
         case '/v1/grant':           return cors(await handleGrant(request, env));
         case '/v1/reset':           return cors(await handleReset(request, env));
         case '/v1/revoke':          return cors(await handleRevoke(request, env));
+        case '/v1/checkout/order':  return cors(await handleCreateOrder(request, env));
+        case '/v1/webhook/razorpay':return cors(await handleRazorpayWebhook(request, env));
         default:                    return cors(json({ error: 'not_found' }, 404));
       }
     } catch (e) {
@@ -168,19 +170,22 @@ async function handleGrant(request, env) {
   if (!email) return json({ error: 'bad_request' }, 400);
 
   const plan = (body && body.plan) === 'subscription' ? 'subscription' : 'lifetime';
-  const existing = (await getUser(env, email)) || { devices: [] };
+  await grantEmail(env, email, plan, body && body.expires_at);
+  return json({ ok: true });
+}
 
+// Marks an email as a paid customer (used by /v1/grant and the Razorpay webhook).
+async function grantEmail(env, email, plan, expiresAt) {
+  const existing = (await getUser(env, email)) || { devices: [] };
   const user = {
     email,
     status: 'active',
-    plan,
+    plan: plan || 'lifetime',
     activated_at: existing.activated_at || Date.now(),
     devices: existing.devices || [],
   };
-  if (plan === 'subscription' && body.expires_at) user.expires_at = Number(body.expires_at);
-
+  if (plan === 'subscription' && expiresAt) user.expires_at = Number(expiresAt);
   await env.LICENSES.put('user:' + email, JSON.stringify(user));
-  return json({ ok: true });
 }
 
 // ─── /v1/reset (admin) — clear device binding so the customer can move machines ───
@@ -245,6 +250,93 @@ async function finalizeLogin(env, reqId, login) {
   await env.LICENSES.put('login:' + reqId, JSON.stringify(login), { expirationTtl: LOGIN_TTL_SECONDS });
 
   return json({ ok: true, session, email: login.email });
+}
+
+// ─── Razorpay: create order ───────────────────────────────────────────────────────
+// Called by the landing page Buy button to start a ₹199 checkout.
+
+async function handleCreateOrder(request, env) {
+  if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
+    return json({ error: 'razorpay_not_configured' }, 503);
+  }
+  const auth = 'Basic ' + btoa(env.RAZORPAY_KEY_ID + ':' + env.RAZORPAY_KEY_SECRET);
+  const res = await fetch('https://api.razorpay.com/v1/orders', {
+    method: 'POST',
+    headers: { Authorization: auth, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      amount: 19900,          // ₹199.00, in paise
+      currency: 'INR',
+      notes: { product: 'Instant Paste — Lifetime' },
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) return json({ error: 'order_failed', detail: data }, 502);
+  return json({ order_id: data.id, amount: data.amount, currency: data.currency, key_id: env.RAZORPAY_KEY_ID });
+}
+
+// ─── Razorpay: webhook (source of truth for granting access) ────────────────────────
+
+async function handleRazorpayWebhook(request, env) {
+  const raw = await request.text();
+  const signature = request.headers.get('X-Razorpay-Signature') || '';
+  const valid = await verifyRazorpaySignature(raw, signature, env.RAZORPAY_WEBHOOK_SECRET);
+  if (!valid) return json({ error: 'bad_signature' }, 401);
+
+  let body;
+  try { body = JSON.parse(raw); } catch { return json({ error: 'bad_request' }, 400); }
+
+  if (body.event === 'payment.captured' || body.event === 'order.paid') {
+    const entity = (body.payload && body.payload.payment && body.payload.payment.entity) || {};
+    const email = normalizeEmail(entity.email || (entity.notes && entity.notes.email));
+    if (email) {
+      await grantEmail(env, email, 'lifetime');
+      try { await sendWelcomeEmail(env, email); } catch (e) { /* non-fatal */ }
+    }
+  }
+  return json({ ok: true });
+}
+
+async function verifyRazorpaySignature(raw, signature, secret) {
+  if (!secret || !signature) return false;
+  const key = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(raw));
+  const hex = Array.from(new Uint8Array(mac)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return hex === signature;
+}
+
+async function sendWelcomeEmail(env, email) {
+  const appName = env.APP_NAME || 'Instant Paste';
+  const dl = env.DOWNLOAD_URL || 'https://premiere-pro-copy-pasting.vercel.app/InstantPasteSetup.exe';
+  const html = `
+  <div style="font-family:-apple-system,Segoe UI,Arial,sans-serif;max-width:460px;margin:0 auto;color:#1c1c1e">
+    <h2 style="margin:0 0 6px">Thanks for buying ${appName}! 🎬</h2>
+    <p style="color:#555;margin:0 0 20px">You're all set. Here's how to get started:</p>
+    <div style="text-align:center;margin:0 0 20px">
+      <a href="${dl}" style="background:#ff6a3d;color:#1a0d07;text-decoration:none;padding:13px 26px;border-radius:8px;font-weight:700;display:inline-block">Download the installer</a>
+    </div>
+    <ol style="color:#333;font-size:14px;line-height:1.7;padding-left:18px">
+      <li>Run the installer (if Windows warns, click "More info" then "Run anyway").</li>
+      <li>Fully restart Adobe Premiere Pro.</li>
+      <li>Open <b>Window &gt; Extensions &gt; Instant Paste</b>.</li>
+      <li>Sign in with this email: <b>${email}</b></li>
+    </ol>
+    <p style="color:#999;font-size:12px;margin-top:20px">Need help? Just reply to this email.</p>
+  </div>`;
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: env.RESEND_FROM || 'onboarding@resend.dev',
+      to: [email],
+      subject: `Your ${appName} download & setup`,
+      html,
+    }),
+  });
+  if (!res.ok) throw new Error('Resend welcome failed: ' + res.status);
 }
 
 // ─── Resend email ───────────────────────────────────────────────────────────────

@@ -177,26 +177,12 @@ function importFileToProject(filePath, folderName) {
           }
         }
 
-        // (b) Otherwise, a track with nothing at the current playhead position
-        if (!chosenTrack) {
-          for (var t2 = 0; t2 < numVideoTracks; t2++) {
-            var trk = seq.videoTracks[t2];
-            if (!trk || trk.isLocked()) continue;
-            var occupied = false;
-            for (var ci = 0; ci < trk.clips.numItems; ci++) {
-              var clip = trk.clips[ci];
-              if (clip && clip.start.seconds <= playheadSeconds && clip.end.seconds > playheadSeconds) {
-                occupied = true;
-                break;
-              }
-            }
-            if (!occupied) { chosenTrack = trk; break; }
-          }
-        }
-
-        // (c) Every track is occupied — create a new video track on top (QE DOM).
-        //     QE is normally pre-enabled at panel startup (initHost) so this
-        //     does NOT trigger the disruptive timeline zoom/refresh mid-edit.
+        // (b) No fully-empty track exists — create a NEW video track on top (QE DOM).
+        //     We deliberately never reuse a track that holds any footage: a still's
+        //     default duration could overwrite a nearby clip on that track. The image
+        //     always lands on a track with zero existing clips, so the customer's
+        //     footage is never overwritten, shifted, or touched.
+        //     QE is pre-enabled at startup (initHost) so this won't zoom the timeline.
         if (!chosenTrack) {
           try {
             // Enable QE only if it isn't active yet (defensive — should already be on)
